@@ -41,4 +41,17 @@ class IndexManager:
     def get_intersected_list(self,keywords):
         """ method to get the intersected documents list for
             the keywords provided in the array
+
+            Parameters:
+                keywords -- array of keywords to search for
+
+            Returns:
+                intersected list of keywords
         """
+        comparelist = get_documents(keywords[0])
+        intersected_list = None
+        for key in keywords:
+            docs = get_documents(key)
+            matches = [filter(lambda m: m in comparelist,docs)]
+            intersected_list.append(matches)
+        return intersected_list
