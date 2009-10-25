@@ -23,6 +23,10 @@ class IndexManager:
     def add_key(self, key, doc):
         """ method to add a document to a index object
             or create a new object
+
+            Parameters:
+                key -- the keyword to add to the index
+                doc -- the document id to add
         """
         if (self.index[key]):
             if doc not in self.index[key]:
@@ -35,6 +39,12 @@ class IndexManager:
     def get_documents(self,key):
         """ method to get documents which contain the given
             key
+
+            Parameters:
+                key -- the keyword to get the documents for
+
+            Returns:
+                array of document IDs for the given key
         """
         return self.index[key]
 
