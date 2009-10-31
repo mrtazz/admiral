@@ -93,33 +93,7 @@ class IndexManager:
                     result.append([intlist[0],i,u])
         return result
 
-    def write_object_to_disk(self,filepath,obj=None):
-        """ method to write the object to the provided filepath
 
-            Parameters:
-                filepath -- file to write the index to
-        """
-        if (obj==None): obj = self.index
-
-        try:
-            f = open(filepath, 'w')
-            pickle.dump(obj, f)
-        except:
-            pass
-
-    def read_object_from_disk(self,filepath,ret=False):
-        """ method to read object from file
-
-            Parameters:
-                filepath -- file to read index from
-        """
-        try:
-            f = open(filepath, 'r')
-            loaded_object = pickle.load(f)
-        except:
-            pass
-        if (ret==False): self.index = loaded_object
-        else: return loaded_object
 
     def get_word_frequencies(self):
         """ create object with frequencies of word occurrences

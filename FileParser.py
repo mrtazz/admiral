@@ -61,26 +61,30 @@ class DocumentParser:
         """
         return self.documents
 
-    def write_index_to_disk(self,filepath):
-        """ method to write the index to the provided filepath
+    def write_object_to_disk(self,filepath,obj=None):
+        """ method to write the object to the provided filepath
 
             Parameters:
                 filepath -- file to write the index to
         """
+        if (obj==None): obj = self.index
+
         try:
             f = open(filepath, 'w')
-            pickle.dump(self.index, f)
+            pickle.dump(obj, f)
         except:
             pass
 
-    def read_index_from_disk(self,filepath):
-        """ method to read index from file
+    def read_object_from_disk(self,filepath,ret=False):
+        """ method to read object from file
 
             Parameters:
                 filepath -- file to read index from
         """
         try:
             f = open(filepath, 'r')
-            self.index = pickle.load(f)
+            loaded_object = pickle.load(f)
         except:
             pass
+        if (ret==False): self.index = loaded_object
+        else: return loaded_object
