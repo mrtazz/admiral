@@ -7,6 +7,7 @@
 """
 
 import pickle
+import heapq
 from operator import itemgetter
 
 class IndexManager:
@@ -33,12 +34,10 @@ class IndexManager:
         """
         key = key.lower().replace("\n","")
         if (self.index.has_key(key)):
-            if doc not in self.index[key]:
-                self.index[key].append(doc)
-                self.index[key].sort()
+            heapq.heappush(self.index[key],doc)
         else:
-            entry = [doc]
-            self.index[key] = entry
+            self.index[key] = [doc]
+            heapq.heapify(self.index[key])
 
     def get_documents(self,key):
         """ method to get documents which contain the given
@@ -50,7 +49,8 @@ class IndexManager:
             Returns:
                 array of document IDs for the given key
         """
-        return self.index[key.lower()]
+        documents = self.index[key.lower()]
+        return documents
 
     def get_intersected_list(self,keywords):
         """ method to get the intersected documents list for
