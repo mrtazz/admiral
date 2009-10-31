@@ -10,21 +10,16 @@ import FileParser
 from operator import itemgetter
 
 def main():
+    search()
+
+def search():
     maindir = "/Users/mrtazz/Documents/Computer Science/rfc_2000/"
-    foo = InvertedIndex.IndexManager()
-    bar = FileParser.DocumentParser(maindir)
-    files = bar.get_folder_content()
-    filelookup = {}
-    #print "Add words."
-    for f in files:
-        h,words = bar.parse_file(maindir+f)
-        filelookup[h] = f
-        for w in words:
-             foo.add_key(str(w),h)
+    foo = InvertedIndex.IndexManager(maindir)
+    foo.build_index()
 
     # dump objects
-    foo.write_object_to_disk(obj=filelookup,filepath="/Users/mrtazz/Documents/Computer Science/rfc_names")
-    foo.write_object_to_disk(filepath="/Users/mrtazz/Documents/Computer Science/rfc_searchindex")
+    #foo.write_object_to_disk(obj=filelookup,filepath="/Users/mrtazz/Documents/Computer Science/rfc_names")
+    #foo.write_object_to_disk(filepath="/Users/mrtazz/Documents/Computer Science/rfc_searchindex")
 
     # load objects
     #foo.read_object_from_disk(filepath="/Users/mrtazz/Documents/Computer Science/rfc_searchindex")
@@ -44,12 +39,11 @@ def main():
                 #count = 1
                 #freq = f[1]
 
-    #print "Searching"
-    searchwords = ['affeaffe', 'rfc']
+    print "Searching"
+    searchwords = ['affeaffe', 'rfc',]
     l =  foo.get_intersected_list(searchwords)
-    #print "Size of the index is %s." % (foo.get_index_size())
-    for i in l:
-        print filelookup[i]
+    print "Size of the index is %s." % (foo.get_index_size())
+    print l
 
 if __name__ == '__main__':
     main()
