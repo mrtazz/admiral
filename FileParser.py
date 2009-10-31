@@ -23,30 +23,12 @@ class DocumentParser:
             Parameters:
                 folder - path to the folder in which the documents to index reside
         """
+        self.doccounter = 0
         try:
             for root, folders, files in os.walk(folder):
                 self.documents = files
         except:
             pass
-
-    def get_words_from_file(self, filename):
-        """ method to get all words from a textfile
-
-            Parameters:
-                filename -- file to parse
-            Returns:
-                array of words contained in the file
-        """
-        words =[]
-        try:
-            f = open(filename, 'r')
-            for line in f.readlines():
-                line = re.sub(r'\W+', ' ', line)
-                words.extend(line.split(None))
-            f.close()
-        except:
-            pass
-        return words
 
     def parse_file(self, filename):
         """ Method to call for parsing a file
@@ -58,14 +40,18 @@ class DocumentParser:
                 hash of the textfile as ID
                 array of words contained in the textfile
         """
+        words = []
         try:
-            f = open(filename,'r')
-            h = hashlib.sha1(f.read())
+            f = open(filename, 'r')
+            for line in f.readlines():
+                matches = re.findall('\w+', line)
+                words.extend(matches)
             f.close()
         except:
             pass
-        words = self.get_words_from_file(filename)
-        return h.hexdigest(),words
+
+        self.doccounter = self.doccounter+1
+        return self.doccounter,words
 
     def get_folder_content(self):
         """ method to return the list of files in the specified folder
