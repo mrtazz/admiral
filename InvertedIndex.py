@@ -6,8 +6,8 @@
 @date 2009-10-24
 """
 
-import pickle
 import heapq
+import FileParser
 from operator import itemgetter
 
 class IndexManager:
@@ -22,20 +22,38 @@ class IndexManager:
         where key is the word and documents is an array with
         the document IDs
     """
-    index = {}
+    def __init__(self,folder):
+        """ Constructor which creates the index and the set to hold
+            the actual filenames
+        """
+        self.index = {}
+        self.filenames = {}
+        self.parser = FileParser.DocumentParser(folder)
 
-    def add_key(self, key, doc):
+    def build_index(self):
+        """ method to build the inverted index for the
+            documents in the given folder. the file parser
+            object is used to parse the single files.
+        """
+        docs = self.parser.get_documents()
+        for d in docs:
+            docid,words = self.parser.parse_file(d)
+            for w in words:
+                self.add_key(w,docid,d)
+
+    def add_key(self, key, doc, filename):
         """ method to add a document to a index object
             or create a new object
 
             Parameters:
-                key -- the keyword to add to the index
-                doc -- the document id to add
+                key         -- the keyword to add to the index
+                doc         -- the document id to add
+                filename    -- the actual name of the document
         """
-        key = key.lower().replace("\n","")
-        if (self.index.has_key(key)):
+        self.filenames[doc] = filename
+        try:
             heapq.heappush(self.index[key],doc)
-        else:
+        except:
             self.index[key] = [doc]
             heapq.heapify(self.index[key])
 
@@ -62,11 +80,16 @@ class IndexManager:
             Returns:
                 intersected list of keywords
         """
+        # list to start intersection with
         comparelist = self.get_documents(keywords.pop(0))
+        # list to later hold the actual filenames
+        returnlist = []
         for key in keywords:
             docs = self.get_documents(key)
             set(comparelist).intersection(set(docs))
-        return comparelist
+        for c in comparelist:
+            returnlist.append(self.filenames[c])
+        return returnlist
 
     def get_index_size(self):
         """ method to get length of the index

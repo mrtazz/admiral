@@ -16,7 +16,6 @@ import pickle
 class DocumentParser:
     """ Document parsing class
     """
-    documents = []
     def __init__(self,folder):
         """ Constructor
 
@@ -24,17 +23,19 @@ class DocumentParser:
                 folder - path to the folder in which the documents to index reside
         """
         self.doccounter = 0
+        self.documents = []
+        self.folder = folder
         try:
-            for root, folders, files in os.walk(folder):
+            for root, folders, files in os.walk(self.folder):
                 self.documents = files
         except:
             pass
 
-    def parse_file(self, filename):
+    def parse_file(self,doc):
         """ Method to call for parsing a file
 
             Parameters:
-                filename -- name of the textfile to parse
+                doc -- the filename of the document to parse
 
             Returns:
                 hash of the textfile as ID
@@ -42,23 +43,18 @@ class DocumentParser:
         """
         words = []
         try:
-            f = open(filename, 'r')
+            f = open(self.folder+doc, 'r')
             for line in f.readlines():
                 matches = re.findall('\w+', line)
                 words.extend(matches)
             f.close()
         except:
             pass
-
         self.doccounter = self.doccounter+1
         return self.doccounter,words
 
-    def get_folder_content(self):
-        """ method to return the list of files in the specified folder
-
-            Returns:
-                array of documents returned from os.walk()
-        """
+    def get_documents(self):
+        """ method to return documents"""
         return self.documents
 
     def write_object_to_disk(self,filepath,obj=None):
