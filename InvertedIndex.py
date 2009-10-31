@@ -63,12 +63,10 @@ class IndexManager:
                 intersected list of keywords
         """
         comparelist = self.get_documents(keywords.pop(0))
-        intersected_list = []
         for key in keywords:
             docs = self.get_documents(key)
-            matches = filter(lambda m: m in comparelist,docs)
-            intersected_list.extend(matches)
-        return intersected_list
+            set(comparelist).intersection(set(docs))
+        return comparelist
 
     def get_index_size(self):
         """ method to get length of the index
