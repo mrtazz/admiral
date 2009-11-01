@@ -42,17 +42,15 @@ class Webserver:
             while True:
                 # get socket object and client address
                 connection, clientsock = self.socket.accept()
-                print "Client %s connected with port %s." % (itemgetter(0)(clientsock),itemgetter(1)(clientsock))
-                #while True:
+                print "Client %s connected." % (itemgetter(0)(clientsock))
                 data = connection.recv(8192)
                 if not data: break
                 # build proper response for request
                 response = self.get_header() + self.parse_header(data)
                 connection.send(response)
                 print data
-                # end while
                 connection.close()
-                print "Client %s disconnected with port %s." % (itemgetter(0)(clientsock),itemgetter(1)(clientsock))
+                print "Client %s disconnected." % (itemgetter(0)(clientsock))
         finally:
             # don't leave socket open when going home
             self.socket.close()
@@ -67,9 +65,13 @@ class Webserver:
                 the proper response to the request
         """
         data = data.split("\n")[0]
-        action = str(re.findall(self.re_action,data)[0])
-        action = re.sub("\/","",action)
-        action = re.sub("\?","",action)
+        action = None
+        try:
+            action = str(re.findall(self.re_action,data)[0])
+            action = re.sub("\/","",action)
+            action = re.sub("\?","",action)
+        except:
+            pass
         params = {}
         matches = re.findall(self.re_params,data)
         for m in matches:
