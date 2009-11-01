@@ -145,11 +145,3 @@ class Webserver:
         server = "Server: py-admiral 0.1 \n"
         length = "Content-Length: %s \n" % (length)
         return status[code] + content + date + server + length + "\n"
-
-def main():
-    foo = Webserver()
-    foo.bind_to_port()
-
-
-if __name__ == '__main__':
-    main()
