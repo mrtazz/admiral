@@ -4,6 +4,7 @@ Author: Daniel Schauenberg <schauend@informatik.uni-freiburg.de>
 Description: class for implementing a search engine web server
 """
 import socket
+import time
 from operator import itemgetter
 
 class Webserver:
@@ -42,6 +43,14 @@ class Webserver:
         finally:
             # don't leave socket open when going home
             self.socket.close()
+
+    def get_header(self):
+        """ method to create the basic header for returning to
+            the client
+        """
+        http_ok_status = "HTTP/1.1 200 OK\n"
+        date = time.strftime("%a, %d %b %Y %H:%M:%S %Z \n\n", time.gmtime())
+        return http_ok_status + date
 
 def main():
     foo = Webserver()
