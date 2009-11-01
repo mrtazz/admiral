@@ -69,7 +69,7 @@ class IndexManager:
         """
         try:
             documents = self.index[key.lower()]
-            return documents
+            return list(set(documents))
         except Exception, e:
             return -1
 
@@ -91,6 +91,7 @@ class IndexManager:
         returnlist = []
         for key in keywords:
             docs = self.get_documents(key)
+            if (docs == -1): return -1
             set(comparelist).intersection(set(docs))
         for c in comparelist:
             returnlist.append(self.filenames[c])
