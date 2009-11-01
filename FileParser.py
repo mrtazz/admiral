@@ -24,7 +24,8 @@ class DocumentParser:
         """
         self.doccounter = 0
         self.documents = []
-        self.folder = folder
+        if (re.findall("/$",folder)): self.folder = folder
+        else: self.folder = folder +"/"
         try:
             for root, folders, files in os.walk(self.folder):
                 self.documents = files
