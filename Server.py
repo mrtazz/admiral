@@ -5,6 +5,7 @@ Description: class for implementing a search engine web server
 """
 import socket
 import time
+import re
 from operator import itemgetter
 
 class Webserver:
@@ -18,6 +19,15 @@ class Webserver:
         self.host = host
         self.port = port
         self.socket = None
+        # actions which are executable by the webserver
+        self.actions = {
+                            "sentence" : self.repeat_sentence,
+                            "default"  : self.http_404
+                       }
+        self.re_params = re.compile("\w+=\w+")
+        self.re_action = re.compile("/\w+\?")
+        # keyword to recognize that a sentence should be repeated
+        self.sentence_keyword = "sentence"
 
     def bind_to_port(self):
         """ simple method to make the port binding easier
@@ -33,16 +43,39 @@ class Webserver:
                 # get socket object and client address
                 connection, clientsock = self.socket.accept()
                 print "Client %s connected with port %s." % (itemgetter(0)(clientsock),itemgetter(1)(clientsock))
-                while True:
-                    data = connection.recv(8192)
-                    if not data: break
-                    #connection.sendall(data)
-                    print data
+                #while True:
+                data = connection.recv(8192)
+                if not data: break
+                # build proper response for request
+                response = self.get_header() + self.parse_header(data)
+                connection.send(response)
+                print data
+                # end while
                 connection.close()
-                print clientaddr
+                print "Client %s disconnected with port %s." % (itemgetter(0)(clientsock),itemgetter(1)(clientsock))
         finally:
             # don't leave socket open when going home
             self.socket.close()
+
+    def parse_header(self,data):
+        """ method to parse the HTTP header for specific actions
+
+            Parameters:
+                data -- the header data to be parsed
+
+            Return:
+                the proper response to the request
+        """
+        data = data.split("\n")[0]
+        action = str(re.findall(self.re_action,data)[0])
+        action = re.sub("\/","",action)
+        action = re.sub("\?","",action)
+        params = {}
+        matches = re.findall(self.re_params,data)
+        for m in matches:
+            params[m.split("=")[0]] = m.split("=")[1]
+        return self.actions.get(action,self.http_404)(params)
+
 
     def repeat_sentence(self,params):
         """ method to repeat a specific sentence a provided
@@ -60,6 +93,7 @@ class Webserver:
                 <body> %s </body></html>\
                 " % (count,rep_sent)
         return html
+
     def http_404(self,*args):
         """ basic HTTP 404 not found response
 
@@ -75,6 +109,7 @@ class Webserver:
                 </html>\
                "
         return html
+
     def get_header(self):
         """ method to create the basic header for returning to
             the client
