@@ -67,8 +67,11 @@ class IndexManager:
             Returns:
                 array of document IDs for the given key
         """
-        documents = self.index[key.lower()]
-        return documents
+        try:
+            documents = self.index[key.lower()]
+            return documents
+        except Exception, e:
+            return -1
 
     def get_intersected_list(self,keywords):
         """ method to get the intersected documents list for
@@ -82,6 +85,8 @@ class IndexManager:
         """
         # list to start intersection with
         comparelist = self.get_documents(keywords.pop(0))
+        if  (comparelist == -1):
+            return -1
         # list to later hold the actual filenames
         returnlist = []
         for key in keywords:
