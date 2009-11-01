@@ -25,7 +25,7 @@ class Webserver:
                             "default"  : self.http_404
                        }
         self.re_params = re.compile("\w+=\w+")
-        self.re_action = re.compile("/\w+\?")
+        self.re_action = re.compile("/\w+")
         # keyword to recognize that a sentence should be repeated
         self.sentence_keyword = "sentence"
 
@@ -86,7 +86,10 @@ class Webserver:
             Parameters:
                 count -- number of times to repeat the sentence
         """
-        count = int(params["repeat"])
+        try:
+            count = int(params["repeat"])
+        except:
+            count = 1
         rep_sent = ""
         for i in range(0,count):
             rep_sent += "All your base are belong to us! </br>"
