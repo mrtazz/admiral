@@ -111,7 +111,7 @@ class Webserver:
         html = "<html><head><title>Sentence repeated %s times</title></head>\
                 <body> %s </body></html>\
                 " % (count,rep_sent)
-        return self.get_header(code=200,length=len(html))+html
+        return self.get_header(code = 200,length = len(html)) + html
 
     def search_words(self,params):
         """ method to search for keywords in the inverted index
@@ -125,40 +125,38 @@ class Webserver:
         # start of html output
         html = "<html><head><title>Search Results</title></head>\
                 <body><h1> Search results: </h1>"
-        print params
         try:
             keywords = params["keywords"].split("+")
         except:
             html = "<html><head><title>not found</title></head>\
                     <body><h2>No keywords given.</h2></body></html>"
-            return self.get_header(code=200,length=len(html))+html
-        keys = keywords
+            return self.get_header(code = 200,length = len(html)) + html
         # the first word is saved, because later on we have to put it
         # on the list again since it is a mutable python object and we
         # would lose one keyword for the intersection otherwise
-        first_word = keys.pop(0)
-        keywords_text = ""+first_word
+        first_word = keywords.pop(0)
+        keywords_text = "" + first_word
         # append all keywords to a string
-        for k in keys:
+        for k in keywords:
             keywords_text += ", "+k
+        # append the first item again
         keywords.append(first_word)
-        print keywords
         # get the list intersection for the keywords
         result = self.index_manager.get_intersected_list(keywords)
         # check if there were any results
         if (result == -1):
             # result -1 means one of the keywords wasn't in the index
-            html+= "<h3> The keyword combination %s was not found in\
+            html += "<h3> The keyword combination %s was not found in\
                     any document.</h3>" % (keywords_text)
         else:
             # put together documents containing the keywords
-            html +="<h3> The keywords %s appear together in these\
+            html += "<h3> The keywords %s appear together in these\
                     documents: </h3>" % (keywords_text)
             for r in result:
                 html += r+"</br>"
 
         html += "</body></html>"
-        return self.get_header(code=200,length=len(html))+html
+        return self.get_header(code = 200,length = len(html)) + html
 
     def http_404(self,*args):
         """ basic HTTP 404 not found response
@@ -173,7 +171,7 @@ class Webserver:
                 </body>\
                 </html>\
                "
-        return self.get_header(code=404,length=len(html))+html
+        return self.get_header(code = 404,length = len(html)) + html
 
     def get_header(self, code=200, length=""):
         """ method to create the basic header for returning to
