@@ -44,6 +44,22 @@ class Webserver:
             # don't leave socket open when going home
             self.socket.close()
 
+    def repeat_sentence(self,params):
+        """ method to repeat a specific sentence a provided
+            number of times
+
+            Parameters:
+                count -- number of times to repeat the sentence
+        """
+        count = int(params["repeat"])
+        rep_sent = ""
+        for i in range(0,count):
+            rep_sent += "All your base are belong to us! </br>"
+        html = "\
+                <html><head><title>Sentence repeated %s times</title></head>\
+                <body> %s </body></html>\
+                " % (count,rep_sent)
+        return html
     def http_404(self,*args):
         """ basic HTTP 404 not found response
 
