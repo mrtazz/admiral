@@ -25,6 +25,7 @@ class Webserver:
         self.actions = {
                             "sentence" : self.repeat_sentence,
                             "search"   : self.search_words,
+                            "index"    : self.search_index_page,
                             "default"  : self.http_404
                        }
         self.re_params = re.compile("\w+=[a-zA-Z0-9+]+")
@@ -156,6 +157,24 @@ class Webserver:
                 html += r+"</br>"
 
         html += "</body></html>"
+        return self.get_header(code = 200,length = len(html)) + html
+
+    def search_index_page(self,params):
+        """ simple method to display a page with a search box
+
+            Parameters:
+                params -- HTTP GET parameters
+
+            Returns:
+                html index page
+        """
+        html = '<html><head><title>Inverted Index Search</title></head>\
+                <body><h2>Inverted Index Search:</h2>\
+                <form name="input" action="/search" method="get">\
+                Insert words to search for: </br>\
+                <input type="text" name="keywords" />\
+                <input type="submit" value="Submit" />\
+                </form></body></html>'
         return self.get_header(code = 200,length = len(html)) + html
 
     def http_404(self,*args):
