@@ -6,6 +6,7 @@ Description: class for implementing a search engine web server
 import socket
 import time
 import re
+import InvertedIndex
 from operator import itemgetter
 
 class Webserver:
@@ -19,6 +20,7 @@ class Webserver:
         self.host = host
         self.port = port
         self.socket = None
+        self.index_manager = None
         # actions which are executable by the webserver
         self.actions = {
                             "sentence" : self.repeat_sentence,
@@ -28,6 +30,17 @@ class Webserver:
         self.re_action = re.compile("/\w+")
         # keyword to recognize that a sentence should be repeated
         self.sentence_keyword = "sentence"
+
+    def build_index(self,filepath):
+        """ method to build the inverted index from which the
+            searches will be done later on
+
+            Parameters:
+                filepath -- the path to the folder to index
+        """
+        self.index_manager = InvertedIndex.IndexManager(filepath)
+        self.index_manager.build_index()
+        return self.index_manager.get_index_size()
 
     def bind_to_port(self):
         """ simple method to make the port binding easier
