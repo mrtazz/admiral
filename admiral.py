@@ -24,20 +24,11 @@ def main():
 
     print "Creating server object."
     server = Server.Webserver(port=options.port)
-    print "Indexing Files."
+    print "Indexing Files..."
     size = server.build_index(options.folder)
     print "Index created with %s words." % (size)
     print "Binding server to port ... done."
     server.bind_to_port()
-
-def usage():
-    """ Function to print usage help for the server
-    """
-    print "Usage: ./admiral.py [-h] [-p] [-f]"
-    print "Options:"
-    print "-h   print this help"
-    print "-p   port on which to listen for connections"
-    print "-f   path to the folder with the documents to index"
 
 if __name__ == '__main__':
     main()
