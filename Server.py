@@ -44,6 +44,21 @@ class Webserver:
             # don't leave socket open when going home
             self.socket.close()
 
+    def http_404(self,*args):
+        """ basic HTTP 404 not found response
+
+            Returns:
+                http 404 html error page
+        """
+        html = "\
+                <html>\
+                <head><title>HTTP 404 error</title></head>\
+                <body><h1>HTTP 404: File not found</h1></br>\
+                <h4>Nothing to see here, tag along people.</h4>\
+                </body>\
+                </html>\
+               "
+        return html
     def get_header(self):
         """ method to create the basic header for returning to
             the client
