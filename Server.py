@@ -24,9 +24,10 @@ class Webserver:
         # actions which are executable by the webserver
         self.actions = {
                             "sentence" : self.repeat_sentence,
+                            "search"   : self.search_words,
                             "default"  : self.http_404
                        }
-        self.re_params = re.compile("\w+=\w+")
+        self.re_params = re.compile("\w+=[a-zA-Z0-9+]+")
         self.re_action = re.compile("/\w+")
         # keyword to recognize that a sentence should be repeated
         self.sentence_keyword = "sentence"
@@ -115,6 +116,53 @@ class Webserver:
         html = "<html><head><title>Sentence repeated %s times</title></head>\
                 <body> %s </body></html>\
                 " % (count,rep_sent)
+        return self.get_header(code=200,length=len(html))+html
+
+    def search_words(self,params):
+        """ method to search for keywords in the inverted index
+
+            Parameters:
+                params -- the URL GET parameters
+
+            Return:
+                all documents containing the search words
+        """
+        # start of html output
+        html = "<html><head><title>Search Results</title></head>\
+                <body><h1> Search results: </h1>"
+        print params
+        try:
+            keywords = params["keywords"].split("+")
+        except:
+            html = "<html><head><title>not found</title></head>\
+                    <body><h2>No keywords given.</h2></body></html>"
+            return self.get_header(code=200,length=len(html))+html
+        keys = keywords
+        # the first word is saved, because later on we have to put it
+        # on the list again since it is a mutable python object and we
+        # would lose one keyword for the intersection otherwise
+        first_word = keys.pop(0)
+        keywords_text = ""+first_word
+        # append all keywords to a string
+        for k in keys:
+            keywords_text += ", "+k
+        keywords.append(first_word)
+        print keywords
+        # get the list intersection for the keywords
+        result = self.index_manager.get_intersected_list(keywords)
+        # check if there were any results
+        if (result == -1):
+            # result -1 means one of the keywords wasn't in the index
+            html+= "<h3> The keyword combination %s was not found in\
+                    any document.</h3>" % (keywords_text)
+        else:
+            # put together documents containing the keywords
+            html +="<h3> The keywords %s appear together in these\
+                    documents: </h3>" % (keywords_text)
+            for r in result:
+                html += r+"</br>"
+
+        html += "</body></html>"
         return self.get_header(code=200,length=len(html))+html
 
     def http_404(self,*args):
