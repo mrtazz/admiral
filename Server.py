@@ -43,12 +43,16 @@ class Webserver:
                 # get socket object and client address
                 connection, clientsock = self.socket.accept()
                 print "Client %s connected." % (itemgetter(0)(clientsock))
-                data = connection.recv(8192)
+                data = connection.recv(4096)
                 if not data: break
                 # build proper response for request
-                response = self.get_header() + self.parse_header(data)
+                response = self.parse_header(data)
                 connection.send(response)
+                print "Client Header Data:"
                 print data
+                print "========"
+                print "My Response Data"
+                print response
                 connection.close()
                 print "Client %s disconnected." % (itemgetter(0)(clientsock))
         finally:
@@ -65,6 +69,8 @@ class Webserver:
                 the proper response to the request
         """
         data = data.split("\n")[0]
+        if (re.findall("^HEAD",data)):
+            return self.get_header(code=200)
         action = None
         try:
             action = str(re.findall(self.re_action,data)[0])
@@ -93,11 +99,10 @@ class Webserver:
         rep_sent = ""
         for i in range(0,count):
             rep_sent += "All your base are belong to us! </br>"
-        html = "\
-                <html><head><title>Sentence repeated %s times</title></head>\
+        html = "<html><head><title>Sentence repeated %s times</title></head>\
                 <body> %s </body></html>\
                 " % (count,rep_sent)
-        return html
+        return self.get_header(code=200,length=len(html))+html
 
     def http_404(self,*args):
         """ basic HTTP 404 not found response
@@ -105,23 +110,28 @@ class Webserver:
             Returns:
                 http 404 html error page
         """
-        html = "\
-                <html>\
+        html = "<html>\
                 <head><title>HTTP 404 error</title></head>\
                 <body><h1>HTTP 404: File not found</h1></br>\
                 <h4>Nothing to see here, tag along people.</h4>\
                 </body>\
                 </html>\
                "
-        return html
+        return self.get_header(code=404,length=len(html))+html
 
-    def get_header(self):
+    def get_header(self, code=200, length=""):
         """ method to create the basic header for returning to
             the client
         """
-        http_ok_status = "HTTP/1.1 200 OK\n"
-        date = time.strftime("%a, %d %b %Y %H:%M:%S %Z \n\n", time.gmtime())
-        return http_ok_status + date
+        status = {
+                     200 : "HTTP/1.1 200 OK\n",
+                     404 : "HTTP/1.1 404 Not Found\n"
+                 }
+        content = "Content-Type: text/html; charset=UTF-8\n"
+        date = "Date: %s" % (time.strftime("%a, %d %b %Y %H:%M:%S %Z \n", time.localtime()))
+        server = "Server: py-admiral 0.1 \n"
+        length = "Content-Length: %s \n" % (length)
+        return status[code] + content + date + server + length + "\n"
 
 def main():
     foo = Webserver()
