@@ -63,7 +63,7 @@ class DocumentParser:
             Parameters:
                 filepath -- file to write the index to
         """
-        if (obj==None): obj = self.index
+        if (obj==None): return
 
         try:
             f = open(filepath, 'w')
@@ -71,7 +71,7 @@ class DocumentParser:
         except:
             pass
 
-    def read_object_from_disk(self,filepath,ret=False):
+    def read_object_from_disk(self,filepath):
         """ method to read object from file
 
             Parameters:
@@ -82,5 +82,4 @@ class DocumentParser:
             loaded_object = pickle.load(f)
         except:
             pass
-        if (ret==False): self.index = loaded_object
-        else: return loaded_object
+        return loaded_object

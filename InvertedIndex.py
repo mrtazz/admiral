@@ -134,3 +134,21 @@ class IndexManager:
             occurrences[key] = len(self.index[key])
         sorted_occurrences = sorted(occurrences.items(), key=itemgetter(1))
         return sorted_occurrences
+
+    def dump_objects(self,path):
+        """ method to dump methods to disk
+
+            Parameters:
+                path -- filepath where to dump objects
+        """
+        self.parser.write_object_to_disk(path+"index.pickle",self.index)
+        self.parser.write_object_to_disk(path+"filenames.pickle",self.filenames)
+
+    def read_objects(self,path):
+        """ method to read objects from disk
+
+            Parameters:
+                path -- filepath from where to read objects
+        """
+        self.index = self.parser.read_object_from_disk(path+"index.pickle")
+        self.filenames = self.parser.read_object_from_disk(path+"filenames.pickle")
