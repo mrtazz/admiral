@@ -62,11 +62,6 @@ class Webserver:
                 # build proper response for request
                 response = self.parse_header(data)
                 connection.send(response)
-                print "Client Header Data:"
-                print data
-                print "========"
-                print "My Response Data"
-                print response
                 connection.close()
                 print "Client %s disconnected." % (itemgetter(0)(clientsock))
         finally:
