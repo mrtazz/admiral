@@ -16,6 +16,10 @@ class Webserver:
     """
     def __init__(self, host='', port=3366):
         """ constructor method to set the webserver basic settings
+
+            Parameters:
+                host -- address to listen on, default is all
+                port -- port to listen on
         """
         self.host = host
         self.port = port
@@ -40,6 +44,7 @@ class Webserver:
             Parameters:
                 filepath -- the path to the folder to index
         """
+        # build inverted index object
         self.index_manager = InvertedIndex.IndexManager(filepath)
         self.index_manager.build_index()
         return self.index_manager.get_index_size()
@@ -78,20 +83,26 @@ class Webserver:
             Return:
                 the proper response to the request
         """
+        # get the first line of the header
         data = data.split("\n")[0]
+        # HEAD request gets special treatment (returns immediately)
         if (re.findall("^HEAD",data)):
             return self.get_header(code=200)
         action = None
         try:
+            # get the url to determine the method to call
             action = str(re.findall(self.re_action,data)[0])
             action = re.sub("\/","",action)
             action = re.sub("\?","",action)
         except:
             pass
+        # build a dict from all the GET parameters for easier
+        # handling later on
         params = {}
         matches = re.findall(self.re_params,data)
         for m in matches:
             params[m.split("=")[0]] = m.split("=")[1]
+        # call the appropriate method from the actions hashmap
         return self.actions.get(action,self.http_404)(params)
 
 
@@ -103,10 +114,12 @@ class Webserver:
                 count -- number of times to repeat the sentence
         """
         try:
+            # set the count to the number given in the URL
             count = int(params["repeat"])
         except:
             count = 1
         rep_sent = ""
+        # produce the sentence the desired amount of times
         for i in range(0,count):
             rep_sent += "All your base are belong to us! </br>"
         html = "<html><head><title>Sentence repeated %s times</title></head>\
@@ -174,6 +187,7 @@ class Webserver:
             Returns:
                 html index page
         """
+        # html form for entering search terms
         html = '<html><head><title>Inverted Index Search</title></head>\
                 <body><h2>Inverted Index Search:</h2>\
                 <form name="input" action="/search" method="get">\
@@ -189,6 +203,7 @@ class Webserver:
             Returns:
                 http 404 html error page
         """
+        # build a nice 404 page
         html = "<html>\
                 <head><title>HTTP 404 error</title></head>\
                 <body><h1>HTTP 404: File not found</h1></br>\
@@ -202,6 +217,7 @@ class Webserver:
         """ method to create the basic header for returning to
             the client
         """
+        # build header according to given code
         status = {
                      200 : "HTTP/1.1 200 OK\n",
                      404 : "HTTP/1.1 404 Not Found\n"
