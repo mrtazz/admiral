@@ -124,8 +124,8 @@ class Webserver:
                 all documents containing the search words
         """
         # start of html output
-        html = "<html><head><title>Search Results</title></head>\
-                <body><h1> Search results: </h1>"
+        html = '<html><head><title>Search Results</title></head>\
+                <body><h2>Inverted Index Search:</h2>'
         try:
             keywords = params["keywords"].split("+")
         except:
@@ -139,7 +139,7 @@ class Webserver:
         keywords_text = "" + first_word
         # append all keywords to a string
         for k in keywords:
-            keywords_text += ", "+k
+            keywords_text += " "+k
         # append the first item again
         keywords.append(first_word)
         # get the list intersection for the keywords
@@ -151,8 +151,14 @@ class Webserver:
                     any document.</h3>" % (keywords_text)
         else:
             # put together documents containing the keywords
-            html += "<h3> The keywords %s appear together in these\
-                    documents: </h3>" % (keywords_text)
+            html += '<form name="input" action="/search" method="get">\
+                    Insert words to search for: </br>\
+                    <input type="text" name="keywords" value="%s" />\
+                    <input type="submit" value="Submit" />\
+                    </form> <h1> Search results: </h1>\
+                    <h3> The keywords \"%s\" appear together in these\
+                    documents: </h3>' % (keywords_text,keywords_text)
+            # add all the results to the page
             for r in result:
                 html += r+"</br>"
 
