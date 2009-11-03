@@ -135,9 +135,7 @@ class Webserver:
             Return:
                 all documents containing the search words
         """
-        # basic page definitions
-        title = "Search Results"
-        body = "<h2>Inverted Index Search:</h2>"
+        # see if we got keywords provided
         try:
             keywords = params["keywords"].split("+")
         except:
@@ -149,27 +147,34 @@ class Webserver:
         # would lose one keyword for the intersection otherwise
         first_word = keywords.pop(0)
         keywords_text = "" + first_word
+
         # append all keywords to a string
         for k in keywords:
             keywords_text += " "+k
         # append the first item again
         keywords.append(first_word)
+
+        # basic page definitions
+        title = "Search Results"
+        body = '<h2>Inverted Index Search:</h2> \
+                <form name="input" action="/search" method="get">\
+                Insert words to search for: </br>\
+                <input type="text" name="keywords" value="%s" />\
+                <input type="submit" value="Submit" />\
+                </form> <h1> Search results: </h1>' % (keywords_text)
+
         # get the list intersection for the keywords
         result = self.index_manager.get_intersected_list(keywords)
+
         # check if there were any results
         if (result == -1):
             # result -1 means one of the keywords wasn't in the index
-            body += "<h3> The keyword combination %s was not found in\
-                    any document.</h3>" % (keywords_text)
+            body += '<h3> The keyword combination \"%s\" was not found in\
+                    any document.</h3>' % (keywords_text)
         else:
             # put together documents containing the keywords
-            body += '<form name="input" action="/search" method="get">\
-                    Insert words to search for: </br>\
-                    <input type="text" name="keywords" value="%s" />\
-                    <input type="submit" value="Submit" />\
-                    </form> <h1> Search results: </h1>\
-                    <h3> The keywords \"%s\" appear together in these\
-                    documents: </h3>' % (keywords_text,keywords_text)
+            body +=  '<h3> The keywords \"%s\" appear together in these\
+                    documents: </h3>' % (keywords_text)
             # add all the results to the page
             for r in result:
                 body += r+"</br>"
