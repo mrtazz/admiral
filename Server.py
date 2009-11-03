@@ -122,9 +122,8 @@ class Webserver:
         # produce the sentence the desired amount of times
         for i in range(0,count):
             rep_sent += "All your base are belong to us! </br>"
-        html = "<html><head><title>Sentence repeated %s times</title></head>\
-                <body> %s </body></html>\
-                " % (count,rep_sent)
+        title = "Sentence repeated %s times" % count
+        html = self.get_html_page(title,rep_sent)
         return self.get_header(code = 200,length = len(html)) + html
 
     def search_words(self,params):
@@ -136,15 +135,15 @@ class Webserver:
             Return:
                 all documents containing the search words
         """
-        # start of html output
-        html = '<html><head><title>Search Results</title></head>\
-                <body><h2>Inverted Index Search:</h2>'
+        # basic page definitions
+        title = "Search Results"
+        body = "<h2>Inverted Index Search:</h2>"
         try:
             keywords = params["keywords"].split("+")
         except:
-            html = "<html><head><title>not found</title></head>\
-                    <body><h2>No keywords given.</h2></body></html>"
+            html = self.get_html_page("not found","<h2>No keywords given.</h2>")
             return self.get_header(code = 200,length = len(html)) + html
+
         # the first word is saved, because later on we have to put it
         # on the list again since it is a mutable python object and we
         # would lose one keyword for the intersection otherwise
@@ -160,11 +159,11 @@ class Webserver:
         # check if there were any results
         if (result == -1):
             # result -1 means one of the keywords wasn't in the index
-            html += "<h3> The keyword combination %s was not found in\
+            body += "<h3> The keyword combination %s was not found in\
                     any document.</h3>" % (keywords_text)
         else:
             # put together documents containing the keywords
-            html += '<form name="input" action="/search" method="get">\
+            body += '<form name="input" action="/search" method="get">\
                     Insert words to search for: </br>\
                     <input type="text" name="keywords" value="%s" />\
                     <input type="submit" value="Submit" />\
@@ -173,9 +172,9 @@ class Webserver:
                     documents: </h3>' % (keywords_text,keywords_text)
             # add all the results to the page
             for r in result:
-                html += r+"</br>"
+                body += r+"</br>"
 
-        html += "</body></html>"
+        html = self.get_html_page(title,body)
         return self.get_header(code = 200,length = len(html)) + html
 
     def search_index_page(self,params):
@@ -188,13 +187,13 @@ class Webserver:
                 html index page
         """
         # html form for entering search terms
-        html = '<html><head><title>Inverted Index Search</title></head>\
-                <body><h2>Inverted Index Search:</h2>\
+        title = "Inverted Index Search"
+        body = '<h2>Inverted Index Search:</h2>\
                 <form name="input" action="/search" method="get">\
                 Insert words to search for: </br>\
                 <input type="text" name="keywords" />\
-                <input type="submit" value="Submit" />\
-                </form></body></html>'
+                <input type="submit" value="Submit" /></form>'
+        html = self.get_html_page(title,body)
         return self.get_header(code = 200,length = len(html)) + html
 
     def http_404(self,*args):
@@ -204,13 +203,10 @@ class Webserver:
                 http 404 html error page
         """
         # build a nice 404 page
-        html = "<html>\
-                <head><title>HTTP 404 error</title></head>\
-                <body><h1>HTTP 404: File not found</h1></br>\
-                <h4>Nothing to see here, tag along people.</h4>\
-                </body>\
-                </html>\
-               "
+        title = "HTTP 404 error"
+        body = "<h1>HTTP 404: File not found</h1></br>\
+                <h4>Nothing to see here, tag along people.</h4>"
+        html = self.get_html_page(title,body)
         return self.get_header(code = 404,length = len(html)) + html
 
     def get_header(self, code=200, length=""):
@@ -227,3 +223,18 @@ class Webserver:
         server = "Server: py-admiral 0.1 \n"
         length = "Content-Length: %s \n" % (length)
         return status[code] + content + date + server + length + "\n"
+
+    def get_html_page(self,title,content):
+        """ method to return a basic html header with a title
+
+            Parameters:
+                title   -- the html page title
+                content -- the content of the page
+
+            Returns:
+                a basic html page
+        """
+        html =  "<html>\
+                <head><title>%s</title></head>\
+                <body>%s</body></html>" % (title,content)
+        return html
