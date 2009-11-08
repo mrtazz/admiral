@@ -19,8 +19,14 @@ class IndexManager:
         index = {
                     key : documents
                 }
-        where key is the word and documents is an array with
-        the document IDs
+        where key is the word and documents is also a hash
+        map containing the document id and term frequency
+        in the form of
+
+        document = {
+                        id  : id,
+                        tf  : frequency
+                   }
     """
     def __init__(self,folder):
         """ Constructor which creates the index and the set to hold
@@ -51,11 +57,18 @@ class IndexManager:
                 filename    -- the actual name of the document
         """
         self.filenames[doc] = filename
+        # see if we already have the word in the index
+        docobj = None
         try:
-            heapq.heappush(self.index[key],doc)
-        except:
-            self.index[key] = [doc]
-            heapq.heapify(self.index[key])
+            docobj = self.index[key]
+            # check if the document already contains the word
+            try:
+                docobj[doc] += 1
+            except KeyError:
+                docobj[doc] = 1
+
+        except KeyError:
+            self.index[key] = { doc : 1 }
 
     def get_documents(self,key):
         """ method to get documents which contain the given
