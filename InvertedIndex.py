@@ -93,7 +93,7 @@ class IndexManager:
         for key in keywords:
             docs = self.get_documents(key)
             if (docs == -1): return -1
-            set(comparelist).intersection(set(docs))
+            comparelist = set(comparelist).intersection(set(docs))
         for c in comparelist:
             returnlist.append(self.filenames[c])
         # fix to keep mutable keyword list consistent
