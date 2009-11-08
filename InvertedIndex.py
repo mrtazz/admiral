@@ -84,7 +84,8 @@ class IndexManager:
                 intersected list of keywords
         """
         # list to start intersection with
-        comparelist = self.get_documents(keywords.pop(0))
+        firstkeyword = keywords.pop(0)
+        comparelist = self.get_documents(firstkeyword)
         if  (comparelist == -1):
             return -1
         # list to later hold the actual filenames
@@ -95,6 +96,8 @@ class IndexManager:
             set(comparelist).intersection(set(docs))
         for c in comparelist:
             returnlist.append(self.filenames[c])
+        # fix to keep mutable keyword list consistent
+        keywords.append(firstkeyword)
         return returnlist
 
     def get_index_size(self):
