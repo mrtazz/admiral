@@ -164,7 +164,7 @@ class Webserver:
                 </form> <h1> Search results: </h1>' % (keywords_text)
 
         # get the list intersection for the keywords
-        result = self.index_manager.get_intersected_list(keywords)
+        result = self.index_manager.get_andish_retrieval(keywords)
 
         # check if there were any results
         if (result == -1):
@@ -177,7 +177,7 @@ class Webserver:
                     documents: </h3>' % (keywords_text)
             # add all the results to the page
             for r in result:
-                body += r+"</br>"
+                body += "%s   ||  Score: %s.</br>" %(r[0],r[1])
 
         html = self.get_html_page(title,body)
         return self.get_header(code = 200,length = len(html)) + html
