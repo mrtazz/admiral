@@ -8,6 +8,7 @@
 
 import heapq
 import FileParser
+from math import log
 from operator import itemgetter
 
 class IndexManager:
@@ -24,9 +25,12 @@ class IndexManager:
         in the form of
 
         document = {
-                        id  : id,
-                        tf  : frequency
+                        doc  : scores
                    }
+        scores = {
+                    'tf' : value,
+                    'tf.idf' ; value
+                 }
     """
     def __init__(self,folder):
         """ Constructor which creates the index and the set to hold
@@ -35,6 +39,7 @@ class IndexManager:
         self.index = {}
         self.filenames = {}
         self.parser = FileParser.DocumentParser(folder)
+        self.doc_count = self.parser.get_documents_count()
 
     def build_index(self):
         """ method to build the inverted index for the
@@ -56,19 +61,31 @@ class IndexManager:
                 doc         -- the document id to add
                 filename    -- the actual name of the document
         """
+        key = key.lower()
         self.filenames[doc] = filename
         # see if we already have the word in the index
         docobj = None
         try:
+            # get hash map entry for corresponding word
             docobj = self.index[key]
-            # check if the document already contains the word
             try:
-                docobj[doc] += 1
+                # docobj should have tf and tf.idf entry
+                docobj[doc]['tf'] += 1
+                #tf.idf = tf * log (N / df)
+                docobj[doc]['tf.idf'] = (float(docobj[doc]['tf'])
+                                        * log(self.doc_count/len(self.index[key]),10))
             except KeyError:
-                docobj[doc] = 1
+                # enter a new document
+                docobj[doc] = { 'tf' : 1, 'tf.idf' : 0}
+                #tf.idf = tf * log (N / df)
+                docobj[doc]['tf.idf'] = (float(docobj[doc]['tf'])
+                                                  * log(self.doc_count/len(docobj),10))
 
         except KeyError:
-            self.index[key] = { doc : 1 }
+            self.index[key] = { doc : { 'tf' : 1, 'tf.idf' : 0} }
+            #tf.idf = tf * log (N / df)
+            self.index[key][doc]['tf.idf'] = (float(self.index[key][doc]['tf'])
+                                              * log(self.doc_count/len(self.index[key]),10))
 
     def get_documents(self,key):
         """ method to get documents which contain the given
@@ -82,7 +99,7 @@ class IndexManager:
         """
         try:
             documents = self.index[key.lower()]
-            return list(set(documents))
+            return documents
         except Exception, e:
             return -1
 
@@ -112,6 +129,37 @@ class IndexManager:
         # fix to keep mutable keyword list consistent
         keywords.append(firstkeyword)
         return returnlist
+
+    def get_andish_retrieval(self,keywords):
+        """ method to do and-ish retrieval with scores
+
+            Parameters:
+                keywords -- array of keywords
+
+            Returns:
+                list of unioned search result, ordered by tf.idf score
+        """
+        # list for first keyword to start with
+        ## get documents in the form of
+        # { docname : score }
+        resultlist = {}
+        comparelist = {}
+
+        for key in keywords:
+            # get the rest of the gang
+            docs = self.get_documents(key)
+            if (docs == -1): continue
+            for d in docs:
+                name = self.filenames[d]
+                if (resultlist.has_key(name)):
+                    resultlist[name] += docs[d]['tf.idf']
+                else:
+                    resultlist[name] = docs[d]['tf.idf']
+
+        sorted_results = sorted(resultlist.items(), key=itemgetter(1))
+        sorted_results.reverse()
+        return sorted_results
+
 
     def get_index_size(self):
         """ method to get length of the index
