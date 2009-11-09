@@ -58,6 +58,11 @@ class DocumentParser:
         """ method to return documents"""
         return self.documents
 
+    def get_documents_count(self):
+        """ method to return count of documents
+        """
+        return len(self.documents)
+
     def write_object_to_disk(self,filepath,obj=None):
         """ method to write the object to the provided filepath
 
