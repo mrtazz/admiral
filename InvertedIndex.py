@@ -7,6 +7,7 @@
 """
 
 import heapq
+import sys
 import FileParser
 from math import log
 from operator import itemgetter
@@ -51,6 +52,9 @@ class IndexManager:
             docid,words = self.parser.parse_file(d)
             for w in words:
                 self.add_key(w,docid,d)
+            sys.stdout.write(".")
+            sys.stdout.flush()
+        print "\n"
 
     def add_key(self, key, doc, filename):
         """ method to add a document to a index object
