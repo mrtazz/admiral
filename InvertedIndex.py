@@ -116,16 +116,18 @@ class IndexManager:
         # list to start intersection with
         firstkeyword = keywords.pop(0)
         comparelist = self.get_documents(firstkeyword)
+        lookuplist = self.get_documents(firstkeyword)
         if  (comparelist == -1):
             return -1
         # list to later hold the actual filenames
-        returnlist = []
+        returnlist = {}
         for key in keywords:
             docs = self.get_documents(key)
             if (docs == -1): return -1
-            comparelist = set(comparelist).intersection(set(docs))
+            comparelist = filter(comparelist.has_key, docs.keys())
         for c in comparelist:
-            returnlist.append(self.filenames[c])
+            # create hashmap with filename and score
+            returnlist[self.filenames[c]] = c
         # fix to keep mutable keyword list consistent
         keywords.append(firstkeyword)
         return returnlist
