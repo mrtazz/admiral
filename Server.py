@@ -173,8 +173,7 @@ class Webserver:
                     any document.</h3>' % (keywords_text)
         else:
             # put together documents containing the keywords
-            body +=  '<h3> The keywords \"%s\" appear together in these\
-                    documents: </h3>' % (keywords_text)
+            body +=  '<h3> Search result for keywords \"%s\": </h3>' % (keywords_text)
             # add all the results to the page
             for r in result:
                 body += "%s   ||  Score: %s.</br>" %(r[0],r[1])
