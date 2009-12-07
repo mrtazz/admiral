@@ -17,18 +17,21 @@ def main():
     parser = OptionParser(usage)
     parser.add_option("-f", "--folder", action="store", dest="folder",metavar="FOLDER",
                       help="folder where the documents for indexing reside")
-    parser.add_option("-p", "--port", action="store", type="int", dest="port", metavar="NUM",
+    parser.add_option("-p", "--port", action="store", type="int", dest="port", metavar="NUM", default="3366",
                       help="port on which the server should listen")
 
     (options, args) = parser.parse_args()
 
-    print "Creating server object."
-    server = Server.Webserver(port=options.port)
-    print "Indexing Files..."
-    size = server.build_index(options.folder)
-    print "Index created with %s words." % (size)
-    print "Binding server to port ... done."
-    server.bind_to_port()
+    if not options.folder:
+        parser.error("No folder to parse provided.")
+    else:
+        print "Creating server object."
+        server = Server.Webserver(port=options.port)
+        print "Indexing Files..."
+        size = server.build_index(options.folder)
+        print "Index created with %s words." % (size)
+        print "Binding server to port ... done."
+        server.bind_to_port()
 
 if __name__ == '__main__':
     main()
