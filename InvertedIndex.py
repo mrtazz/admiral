@@ -9,6 +9,7 @@
 import heapq
 import sys
 import FileParser
+import bisect
 from math import log
 from operator import itemgetter
 
@@ -41,6 +42,7 @@ class IndexManager:
         self.filenames = {}
         self.parser = FileParser.DocumentParser(folder)
         self.doc_count = self.parser.get_documents_count()
+        self.index_keys = []
 
     def build_index(self):
         """ method to build the inverted index for the
@@ -48,13 +50,18 @@ class IndexManager:
             object is used to parse the single files.
         """
         docs = self.parser.get_documents()
+        percentfactor = float(100/float(len(docs)))
+        count = 0
         for d in docs:
+            count += 1
             docid,words = self.parser.parse_file(d)
             for w in words:
                 self.add_key(w,docid,d)
-            sys.stdout.write(".")
-            sys.stdout.flush()
+            percentagestring = "%.3f%% done." % (count * percentfactor)
+            print percentagestring
         print "\n"
+        self.index_keys = self.index.keys()
+        self.index_keys.sort()
 
     def add_key(self, key, doc, filename):
         """ method to add a document to a index object
@@ -136,6 +143,55 @@ class IndexManager:
         keywords.append(firstkeyword)
         return returnlist
 
+    def prefix_search(self,prefix):
+        """ method to do prefix search in the inverted index
+
+            Parameters:
+                prefix  --  the prefix to search for
+
+            Returns:
+                list of keywords which contain the prefix
+        """
+        result = []
+        # find first element with prefix
+        first_position = bisect.bisect(self.index_keys,prefix)
+        # get last character
+        last_element = prefix[len(prefix) - 1]
+        # cut off last character
+        prefix = prefix[:-1]
+        # add the next character in the ascii table
+        prefix += chr(ord(last_element) + 1)
+        # search for the last element and get the position left to it
+        last_position = bisect.bisect_left(self.index_keys,prefix)
+        # if both positions are equal, the prefix was not found
+        if (first_position == last_position):
+            return -1
+        else:
+            for i in range(first_position,last_position):
+                result.append(self.index_keys[i])
+            return result
+
+    def k_way_merge(self,keywords):
+        """ method to do a k-way merger
+        """
+        docmap = []
+        retlist = []
+        for k in keywords:
+            docmap.extend(self.get_documents(k).keys())
+
+        heapq.heapify(docmap)
+        actual_item = None
+        while True:
+            try:
+                item = heapq.heappop(docmap)
+                if (item != actual_item):
+                    retlist.append(item)
+                    actual_item = item
+            except IndexError, e:
+               break
+
+        return retlist
+
     def get_andish_retrieval(self,keywords):
         """ method to do and-ish retrieval with scores
 
@@ -191,8 +247,6 @@ class IndexManager:
                 if (len(intlist) == 1):
                     result.append([intlist[0],i,u])
         return result
-
-
 
     def get_word_frequencies(self):
         """ create object with frequencies of word occurrences
