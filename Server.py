@@ -238,7 +238,6 @@ class Webserver:
             Returns:
                 list of matches in xml format
         """
-        print "prefix search called."
         # get prefix
         try:
             prefix = params["query"].split("+")[0]
@@ -255,8 +254,15 @@ class Webserver:
         mergedlist = self.index_manager.k_way_merge(words)
         # enter documents in xml
         if mergedlist != -1:
-            for m in mergedlist:
-                xml += "<item>%s</item>\n" % m
+            all_docs = len(mergedlist)
+            for w in words:
+                docs = self.index_manager.get_documents(w)
+                perc = (float(len(docs)*100))/float(all_docs)
+                xml += "<item>"
+                xml += "<completion>%s</completion>\n" % w
+                xml += "<doclength>%s</doclength>\n" % (len(docs))
+                xml += "<percentage>%.3f</percentage>\n" % (perc)
+                xml += "</item>\n"
 
         xml += "</results>"
         # return xml
