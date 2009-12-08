@@ -190,7 +190,11 @@ class IndexManager:
             except IndexError, e:
                break
 
-        return retlist
+        retnames = []
+        for i in retlist:
+            retnames.append(self.filenames[i])
+
+        return retnames
 
     def get_andish_retrieval(self,keywords):
         """ method to do and-ish retrieval with scores
