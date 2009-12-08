@@ -9,3 +9,7 @@ h2 {
 #searchtext {
     width: 35em;
 }
+
+#results {
+    margin-top: 2em;
+}
