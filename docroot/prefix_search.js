@@ -15,14 +15,23 @@ $(document).ready(function()
     function parse_xml(xml)
     {
         var items = $(xml).find("item");
-        var html_result_string = "<table border='1' id='resulttable'><thead><tr><th>word</th><th>document #</th><th>percentage</th></tr></thead><tbody>";
+        var html_result_string = "<table border='1' id='resulttable'>";
+        html_result_string    += "<thead><tr><th>word</th><th>document #</th>";
+        html_result_string    += "<th>percentage</th><th>%</th></tr></thead>";
+        html_result_string    += "<tbody>";
 
         $(xml).find("item").each(function()
         {
+            var visual_percentage = "|";
             html_result_string += '<tr>';
             html_result_string += '<td>' + $(this).find("completion").text() + '</td>';
             html_result_string += '<td>' + $(this).find("doclength").text() + '</td>';
-            html_result_string += '<td>' + $(this).find("percentage").text() + '</td></tr>';
+            html_result_string += '<td>' + $(this).find("percentage").text() + '</td>';
+            for (var i = 0; i < $(this).find("percentage").text(); i++)
+            {
+                visual_percentage += "|";
+            }
+            html_result_string += '<td>' + visual_percentage + '</td></tr>';
         });
 
         html_result_string += "</tbody></table>";
