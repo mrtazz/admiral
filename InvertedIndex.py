@@ -176,6 +176,7 @@ class IndexManager:
         """
         docmap = []
         retlist = []
+        if keywords == -1: return -1
         for k in keywords:
             docmap.extend(self.get_documents(k).keys())
 
