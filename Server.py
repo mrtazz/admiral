@@ -238,8 +238,13 @@ class Webserver:
             Returns:
                 list of matches in xml format
         """
+        print "prefix search called."
         # get prefix
-        prefix = params["query"].split("+")[0]
+        try:
+            prefix = params["query"].split("+")[0]
+        except KeyError:
+            # just return if we have no query
+            return self.get_header(code = 200, length = 0)
         # build basic xml
         xml = "<?xml version='1.0' encoding='UTF-8'?>\n"
         xml += "<query>%s</query>\n" % prefix
@@ -249,8 +254,9 @@ class Webserver:
         # get documents for the words
         mergedlist = self.index_manager.k_way_merge(words)
         # enter documents in xml
-        for m in mergedlist:
-            xml += "<item>%s</item>\n" % m
+        if mergedlist != -1:
+            for m in mergedlist:
+                xml += "<item>%s</item>\n" % m
 
         xml += "</results>"
         # return xml
