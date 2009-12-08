@@ -19,6 +19,8 @@ def main():
                       help="folder where the documents for indexing reside")
     parser.add_option("-p", "--port", action="store", type="int", dest="port", metavar="NUM", default="3366",
                       help="port on which the server should listen")
+    parser.add_option("-d", "--docroot", action="store", dest="docroot", metavar="DOCROOT", default=".",
+                      help="docroot for pages to be served from the webserver")
 
     (options, args) = parser.parse_args()
 
@@ -26,7 +28,7 @@ def main():
         parser.error("No folder to parse provided.")
     else:
         print "Creating server object."
-        server = Server.Webserver(port=options.port)
+        server = Server.Webserver(port=options.port, docroot=options.docroot)
         print "Indexing Files..."
         size = server.build_index(options.folder)
         print "Index created with %s words." % (size)
