@@ -15,7 +15,7 @@ $(document).ready(function()
     function parse_xml(xml)
     {
         var items = $(xml).find("item");
-        var html_result_string = "<table border='1'> <tr><td>word</td><td>document #</td><td>percentage</td></tr>";
+        var html_result_string = "<table border='1' id='resulttable'><thead><tr><th>word</th><th>document #</th><th>percentage</th></tr></thead><tbody>";
 
         $(xml).find("item").each(function()
         {
@@ -25,8 +25,9 @@ $(document).ready(function()
             html_result_string += '<td>' + $(this).find("percentage").text() + '</td></tr>';
         });
 
-        html_result_string += "</table>";
+        html_result_string += "</tbody></table>";
         $("#results").html(html_result_string);
+        $("#resulttable").tablesorter();
 
     }
 
