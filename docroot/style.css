@@ -13,3 +13,9 @@ h2 {
 #results {
     margin-top: 2em;
 }
+
+th,td {
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+}

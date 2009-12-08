@@ -15,7 +15,7 @@ $(document).ready(function()
     function parse_xml(xml)
     {
         var items = $(xml).find("item");
-        var html_result_string = "<table border='1' id='resulttable'>";
+        var html_result_string = "<table id='resulttable'>";
         html_result_string    += "<thead><tr><th>word</th><th>document #</th>";
         html_result_string    += "<th>percentage</th><th>%</th></tr></thead>";
         html_result_string    += "<tbody>";
