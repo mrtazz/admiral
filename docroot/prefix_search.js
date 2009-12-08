@@ -15,11 +15,17 @@ $(document).ready(function()
     function parse_xml(xml)
     {
         var items = $(xml).find("item");
-        var html_result_string = "Search results: ";
-        for (var i = 0; i < items.length; i++)
+        var html_result_string = "<table border='1'> <tr><td>word</td><td>document #</td><td>percentage</td></tr>";
+
+        $(xml).find("item").each(function()
         {
-            html_result_string += (i > 0 ? ", " : "") + items.eq(i).text();
-        }
+            html_result_string += '<tr>';
+            html_result_string += '<td>' + $(this).find("completion").text() + '</td>';
+            html_result_string += '<td>' + $(this).find("doclength").text() + '</td>';
+            html_result_string += '<td>' + $(this).find("percentage").text() + '</td></tr>';
+        });
+
+        html_result_string += "</table>";
         $("#results").html(html_result_string);
 
     }
