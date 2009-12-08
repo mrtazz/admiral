@@ -129,7 +129,12 @@ class Webserver:
         """
         if pagename in self.pages:
             page = open(self.docroot + pagename).read()
-            return self.get_header(code = 200, length = len(page)) + page
+            ctypes = pagename.split(".")
+            if len(ctypes) > 1:
+                ctype = ctypes[len(ctypes)-1]
+            else:
+                ctype = "html"
+            return self.get_header(code = 200, length = len(page), ctype=ctype) + page
         else:
             return self.http_404()
 
@@ -266,7 +271,7 @@ class Webserver:
 
         xml += "</results>"
         # return xml
-        return self.get_header(code = 200, length = len(xml)) + xml
+        return self.get_header(code = 200, length = len(xml), ctype="xml") + xml
 
     def http_404(self,*args):
         """ basic HTTP 404 not found response
@@ -281,7 +286,7 @@ class Webserver:
         html = self.get_html_page(title,body)
         return self.get_header(code = 404,length = len(html)) + html
 
-    def get_header(self, code=200, length=""):
+    def get_header(self, code=200, length="", ctype="html"):
         """ method to create the basic header for returning to
             the client
         """
@@ -290,7 +295,7 @@ class Webserver:
                      200 : "HTTP/1.1 200 OK\n",
                      404 : "HTTP/1.1 404 Not Found\n"
                  }
-        content = "Content-Type: text/html; charset=UTF-8\n"
+        content = "Content-Type: text/%s; charset=UTF-8\n" % (ctype)
         date = "Date: %s" % (time.strftime("%a, %d %b %Y %H:%M:%S %Z \n", time.localtime()))
         server = "Server: py-admiral 0.1 \n"
         length = "Content-Length: %s \n" % (length)
