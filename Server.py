@@ -6,6 +6,8 @@ Description: class for implementing a search engine web server
 import socket
 import time
 import re
+import sys
+import os
 import InvertedIndex
 from operator import itemgetter
 
@@ -14,7 +16,7 @@ class Webserver:
         inverted index search engine to the outside
         (or inside) world
     """
-    def __init__(self, host='', port=3366):
+    def __init__(self, host='', port=3366, docroot='.'):
         """ constructor method to set the webserver basic settings
 
             Parameters:
@@ -23,17 +25,28 @@ class Webserver:
         """
         self.host = host
         self.port = port
+        if (re.findall("/$",docroot)): self.docroot = docroot
+        else: self.docroot = docroot +"/"
+        self.pages = []
+        # get array of pages, only 1 level at the moment
+        try:
+            for f in os.listdir(self.docroot):
+                if os.path.isfile(self.docroot + f):
+                    self.pages.append(f)
+        except:
+            pass
+
         self.socket = None
         self.index_manager = None
         # actions which are executable by the webserver
         self.actions = {
-                            "sentence" : self.repeat_sentence,
-                            "search"   : self.search_words,
-                            "index"    : self.search_index_page,
-                            "default"  : self.http_404
+                            "sentence"          : self.repeat_sentence,
+                            "search"            : self.search_words,
+                            "prefix_search"     : self.prefix_search,
+                            "default"           : self.http_404
                        }
         self.re_params = re.compile("\w+=[a-zA-Z0-9+]+")
-        self.re_action = re.compile("/\w+")
+        self.re_action = re.compile("/\w+[a-zA-Z0-9.]*")
         # keyword to recognize that a sentence should be repeated
         self.sentence_keyword = "sentence"
 
@@ -103,10 +116,24 @@ class Webserver:
         for m in matches:
             params[m.split("=")[0]] = m.split("=")[1]
         # call the appropriate method from the actions hashmap
-        return self.actions.get(action,self.http_404)(params)
+        return self.actions.get(action,self.get_page_from_fs)(action,params)
 
+    def get_page_from_fs(self, pagename, params):
+        """method for getting files from filesystem
 
-    def repeat_sentence(self,params):
+            Parameters:
+                pagename -- name of the requested page
+
+            Returns:
+                html page or 404 page
+        """
+        if pagename in self.pages:
+            page = open(self.docroot + pagename).read()
+            return self.get_header(code = 200, length = len(page)) + page
+        else:
+            return self.http_404()
+
+    def repeat_sentence(self,pagename,params):
         """ method to repeat a specific sentence a provided
             number of times
 
@@ -126,7 +153,7 @@ class Webserver:
         html = self.get_html_page(title,rep_sent)
         return self.get_header(code = 200,length = len(html)) + html
 
-    def search_words(self,params):
+    def search_words(self,pagename,params):
         """ method to search for keywords in the inverted index
 
             Parameters:
@@ -181,7 +208,7 @@ class Webserver:
         html = self.get_html_page(title,body)
         return self.get_header(code = 200,length = len(html)) + html
 
-    def search_index_page(self,params):
+    def search_index_page(self,pagename,params):
         """ simple method to display a page with a search box
 
             Parameters:
@@ -193,12 +220,41 @@ class Webserver:
         # html form for entering search terms
         title = "Inverted Index Search"
         body = '<h2>Inverted Index Search:</h2>\
-                <form name="input" action="/search" method="get">\
+                <form id="searchform" name="input" action="/prefix_search" method="get">\
                 Insert words to search for: </br>\
-                <input type="text" name="keywords" />\
-                <input type="submit" value="Submit" /></form>'
+                <input id="searchbox" type="text" name="query" />\
+                <input id="searchbutton" type="submit" value="Submit" /></form>'
         html = self.get_html_page(title,body)
         return self.get_header(code = 200,length = len(html)) + html
+
+    def prefix_search(self,pagename,params):
+        """ method to do prefix search with the
+            implemented method from the inverted
+            index
+
+            Parameters:
+                prefix -- the prefix to search for
+
+            Returns:
+                list of matches in xml format
+        """
+        # get prefix
+        prefix = params["query"].split("+")[0]
+        # build basic xml
+        xml = "<?xml version='1.0' encoding='UTF-8'?>\n"
+        xml += "<query>%s</query>\n" % prefix
+        xml += "<results>\n"
+        # get words matching the prefix
+        words = self.index_manager.prefix_search(prefix)
+        # get documents for the words
+        mergedlist = self.index_manager.k_way_merge(words)
+        # enter documents in xml
+        for m in mergedlist:
+            xml += "<item>%s</item>\n" % m
+
+        xml += "</results>"
+        # return xml
+        return self.get_header(code = 200, length = len(xml)) + xml
 
     def http_404(self,*args):
         """ basic HTTP 404 not found response
