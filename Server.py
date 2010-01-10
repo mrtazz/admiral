@@ -250,8 +250,8 @@ class Webserver:
             # just return if we have no query
             return self.get_header(code = 200, length = 0)
         # build basic xml
-        xml = "<?xml version='1.0' encoding='UTF-8'?>\n"
-        xml += "<query>%s</query>\n" % prefix
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+        #xml += "<query>%s</query>\n" % prefix
         xml += "<results>\n"
         # get words matching the prefix
         words = self.index_manager.prefix_search(prefix)
@@ -271,7 +271,7 @@ class Webserver:
 
         xml += "</results>"
         # return xml
-        return self.get_header(code = 200, length = len(xml), ctype="xml") + xml
+        return self.get_header(code = 200, length = len(xml), ctype="xml") + unicode(xml,"UTF-8")
 
     def http_404(self,*args):
         """ basic HTTP 404 not found response
