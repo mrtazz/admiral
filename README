@@ -5,16 +5,12 @@ admiral is a simple python webserver listening directly on a TCP socket.
 All available URLs are stored in a hashmap, where they are mapped to the
 respective methods. At the moment the following URLs are supported:
 
-localhost:port/index    -- search engine index page
-localhost:port/search   -- search URL which can be given keywords as parameters
-                            keywords=keywords1+keyword2+keyword3
-lcoalhost:port/sentence -- takes parameter repeat=count and shows a predefined
-                            sentence count times
+localhost:port/index.html    -- search engine index page
 
 Startup:
 =========
 The webserver is started via the commandline in the form of:
-./admiral.py -p PORT -f FOLDER
+./admiral.py -p PORT -f FOLDER -d DOCROOT
 where PORT is the port the webserver should be ran at and FOLDER is the folder
 with the documents to index for the search page.
 
