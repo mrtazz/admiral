@@ -9,12 +9,11 @@ $(document).ready(function()
     function do_prefix_search()
     {
         var prefix = $("#searchtext").attr("value");
-        $.get("http://localhost:3366/prefix_search?query=" + prefix,{},parse_xml);
+        var res = $.get("http://localhost:3366/prefix_search?query=" + prefix,{},parse_xml);
     }
 
-    function parse_xml(xml)
+    function parse_xml(xml,textstatus)
     {
-        var items = $(xml).find("item");
         var html_result_string = "<table id='resulttable'>";
         html_result_string    += "<thead><tr><th>word</th><th>document #</th>";
         html_result_string    += "<th>percentage</th><th>%</th></tr></thead>";
