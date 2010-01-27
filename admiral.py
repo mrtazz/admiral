@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/bin/env python
 """
 File: admiral.py
 Author: Daniel Schauenberg <schauend@informatik.uni-freiburg.de>
