@@ -282,7 +282,7 @@ class Webserver:
         # build a nice 404 page
         title = "HTTP 404 error"
         body = "<h1>HTTP 404: File not found</h1></br>\
-                <h4>Nothing to see here, tag along people.</h4>"
+                <h4>Nothing to see here, move along people.</h4>"
         html = self.get_html_page(title,body)
         return self.get_header(code = 404,length = len(html)) + html
 
